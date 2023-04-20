@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Label from "@radix-ui/react-label";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
 const inputStyle =
   "w-full h-10 px-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white";
@@ -15,6 +16,7 @@ const EventModal = ({
   handleInputChange,
   formData,
   roomOptions,
+  capacity,
   statusOptions,
   editMode,
 }) => {
@@ -112,6 +114,17 @@ const EventModal = ({
               setRoomTriggerText
             )}
           </div>
+          <div className="mb-4 px-2 w-1/6">
+            <Label.Root className="block text-sm font-bold mb-2">
+              Capacity
+            </Label.Root>
+            <textarea
+              name="capacity"
+              value={formData.capacity}
+              onChange={handleInputChange}
+              className={inputStyle}
+            />
+          </div>
           <div className="mb-4 px-2 w-1/4">
             <Label.Root className="block text-sm font-bold mb-2">
               Status
@@ -208,11 +221,11 @@ const EventModal = ({
 
           <div className="mb-4 px-2 w-1/4">
             <Label.Root className="block text-sm font-bold mb-2">
-              Event Description
+              Notes
             </Label.Root>
             <textarea
-              name="description"
-              value={formData.description}
+              name="notes"
+              value={formData.notes}
               onChange={handleInputChange}
               className={inputStyle}
               rows="8"

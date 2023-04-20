@@ -11,24 +11,37 @@ import TesterPage from "./components/Pages/TesterPage";
 import Calendar from "./components/Calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Menu from "./components/Menu";
+import "./styles/globals.css";
 
 function App() {
-
   return (
-  <div className="app">
-   <BrowserRouter>
-    <AuthContextProvider>
-      <Menu></Menu>
-      <Routes>
-        <Route path='/' element={<Signin />}/>
-        <Route path='/register' element={<Signup />}/>
-        <Route path='/account' element={<ProtectedRoute><Account/></ProtectedRoute>}/>
-        <Route path='calendar' element={<ProtectedRoute><Calendar/></ProtectedRoute>}/> 
-
-      </Routes>
-      </AuthContextProvider>
-    </BrowserRouter>
-  </div>
+    <div className="app">
+      <BrowserRouter>
+        <AuthContextProvider>
+          <Menu></Menu>
+          <Routes>
+            <Route path="/" element={<Signin />} />
+            {/* <Route path="/register" element={<Signup />} /> */}
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="calendar"
+              element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthContextProvider>
+      </BrowserRouter>
+    </div>
   );
 }
 export default App;
