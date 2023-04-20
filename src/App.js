@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { AuthContextProvider, UserAuth } from "./context/AuthContext";
+
+import Signin from "./components/Pages/Signin";
+import Account from "./components/Pages/Account";
+
+import Signup from "./components/Pages/Signup";
+import TesterPage from "./components/Pages/TesterPage";
+import Calendar from "./components/Calendar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Menu from "./components/Menu";
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  <div className="app">
+   <BrowserRouter>
+    <AuthContextProvider>
+      <Menu></Menu>
+      <Routes>
+        <Route path='/' element={<Signin />}/>
+        <Route path='/register' element={<Signup />}/>
+        <Route path='/account' element={<ProtectedRoute><Account/></ProtectedRoute>}/>
+        <Route path='calendar' element={<ProtectedRoute><Calendar/></ProtectedRoute>}/> 
+
+      </Routes>
+      </AuthContextProvider>
+    </BrowserRouter>
+  </div>
   );
 }
-
 export default App;
