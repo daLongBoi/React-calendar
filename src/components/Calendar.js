@@ -78,6 +78,20 @@ const Calendar = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.name) {
+      alert("Please enter the name of the event");
+      return;
+    }
+    if (!formData.date) {
+      alert("Please enter a date");
+      return;
+    }
+    if (!formData.startTime) {
+      alert("Please enter a start time");
+      return;
+    }
+
     const startTime = new Date(`${formData.date}T${formData.startTime}`);
     const endTime = new Date(`${formData.date}T${formData.endTime}`);
     const eventData = {
