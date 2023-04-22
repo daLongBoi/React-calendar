@@ -18,7 +18,7 @@ function App() {
       <BrowserRouter>
         <AuthContextProvider>
           <Menu></Menu>
-          <FileStore/>
+          
           <Routes>
             <Route path="/" element={<Signin />} />
             {/* <Route path="/register" element={<Signup />} /> */}
