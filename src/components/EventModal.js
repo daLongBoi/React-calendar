@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Label from "@radix-ui/react-label";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import FileStore from "./FileStore";
 
 const inputStyle =
   "w-full h-10 px-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white";
@@ -231,6 +232,11 @@ const EventModal = ({
               rows="8"
             />
           </div>
+
+          <div className="mb-4 px-2 w-1/4">
+            <FileStore/>
+          </div>
+          
           <div className="flex px-2 w-full">
             <button
               type="button"

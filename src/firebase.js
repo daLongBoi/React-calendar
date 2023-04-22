@@ -1,10 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, EmailAuthProvider } from "firebase/auth";
 import { getDatabase } from "firebase/database";
-
+import {getStorage} from "firebase/storage"
 const firebaseConfig = {
   apiKey: "AIzaSyCLBpWHQHCZdEXA9BQwueRek0R_K5NwmW4",
-  authDomain: "venue-room-calendar.firebaseapp.com",
+  authDomain: "venuCCe-room-calendar.firebaseapp.com",
   projectId: "venue-room-calendar",
   storageBucket: "venue-room-calendar.appspot.com",
   messagingSenderId: "801152282682",
@@ -16,5 +16,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+export const storage = getStorage(app);
 export const auth = getAuth(app);
 export { app, EmailAuthProvider, database }; // Export EmailAuthProvider

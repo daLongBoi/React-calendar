@@ -45,6 +45,7 @@ const ConditionalSimplified = () => {
                     // here set target value to state which is 0, 1, 2, 3
                     SwitchActivatior(event.target.value);
                 }}>
+                <option value="0">Select:</option>
                 <option value="1">Room1:</option>
                 <option value="2">Room2:</option>
                 <option value="3">Room3:</option>
