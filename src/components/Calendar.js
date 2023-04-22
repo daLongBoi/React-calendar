@@ -12,6 +12,7 @@ import { app, database } from "../firebase";
 import { ref, onValue, set, remove, push } from "firebase/database";
 import MonthlyCalendar from "./MonthlyCalendar";
 import { Toggle } from "@radix-ui/react-toggle";
+import { AccessibilityIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 
 const roomOptions = ["Court Room", "The Open Arms", "The Drawing Room"];
 const statusOptions = ["Confirmed", "Hold", "Cancelled"];
@@ -29,6 +30,7 @@ const Calendar = () => {
     doorsTime: "",
     name: "",
     room: "",
+    capacity: "",
     technicalSpecifications: "",
     accessibilityInfo: "",
     ticketLink: "",
@@ -76,6 +78,20 @@ const Calendar = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.name) {
+      alert("Please enter the name of the event");
+      return;
+    }
+    if (!formData.date) {
+      alert("Please enter a date");
+      return;
+    }
+    if (!formData.startTime) {
+      alert("Please enter a start time");
+      return;
+    }
+
     const startTime = new Date(`${formData.date}T${formData.startTime}`);
     const endTime = new Date(`${formData.date}T${formData.endTime}`);
     const eventData = {
@@ -114,7 +130,7 @@ const Calendar = () => {
       technicalSpecifications: "",
       accessibilityInfo: "",
       ticketLink: "",
-      description: "",
+      notes: "",
       status: "",
     });
 
@@ -170,6 +186,17 @@ const Calendar = () => {
     }
   };
 
+  const accessIcon = (event) => {
+    if (event.accessibilityInfo) {
+      return <AccessibilityIcon className="m-1" />;
+    }
+  };
+  const notesIcon = (event) => {
+    if (event.notes) {
+      return <InfoCircledIcon className="m-1" />;
+    }
+  };
+
   const renderEvents = (day, room) => {
     const filteredEvents = events.filter((event) => {
       const eventDate = new Date(event.startTime);
@@ -185,13 +212,19 @@ const Calendar = () => {
       <div
         key={event.id}
         onClick={() => handleEventClick(event, index)}
-        className={`border border-gray-200 p-1 mb-1 cursor-pointer ${getStatusClass(
+        className={`border border-gray-200 p-2 mb-1 cursor-pointer flex flex-row justify-between items-center ${getStatusClass(
           event.status
         )}`}
       >
-        {event.startTime && format(new Date(event.startTime), "HH:mm")} -{" "}
-        {event.endTime && format(new Date(event.endTime), "HH:mm")}{" "}
-        <strong>{event.name}</strong>
+        <div>
+          {event.startTime && format(new Date(event.startTime), "HH:mm")} -{" "}
+          {event.endTime && format(new Date(event.endTime), "HH:mm")}{" "}
+          <strong>{event.name}</strong>
+        </div>
+        <div>
+          <div>{accessIcon(event)}</div>
+          <div>{notesIcon(event)}</div>
+        </div>
       </div>
     ));
   };
@@ -236,7 +269,7 @@ const Calendar = () => {
                         technicalSpecifications: "",
                         accessibilityInfo: "",
                         ticketLink: "",
-                        description: "",
+                        notes: "",
                         status: "",
                         date: day,
                       });
