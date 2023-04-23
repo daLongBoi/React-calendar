@@ -4,9 +4,9 @@ import * as Label from "@radix-ui/react-label";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import FileStore from "./FileStore";
-
 const inputStyle =
   "w-full h-10 px-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white";
+
 
 const EventModal = ({
   showEventModal,
@@ -27,6 +27,10 @@ const EventModal = ({
   const [statusTriggerText, setStatusTriggerText] = useState(
     formData.status || `Select a status`
   );
+
+  const [folderName, setFolderName] = useState([]);
+
+  
   useEffect(() => {
     setRoomTriggerText(formData.room || "Select a room");
     setStatusTriggerText(formData.status || "Select a status");
@@ -47,7 +51,8 @@ const EventModal = ({
           <DropdownMenu.Item
             key={index}
             onSelect={() => {
-              handleInputChange({ target: { name, value: option } });
+              handleInputChange({ 
+                target: { name, value: option } });
               setTriggerText(option);
             }}
             className="text-white px-2 py-1 hover:bg-gray-700"
@@ -101,8 +106,10 @@ const EventModal = ({
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={inputStyle}
+              className={inputStyle}       
             />
+            {/* {setFolderName(formData.name)} */}
+
           </div>
           <div className="mb-4 px-2 w-1/4">
             <Label.Root className="block text-sm font-bold mb-2">
@@ -234,6 +241,9 @@ const EventModal = ({
           </div>
 
           <div className="mb-4 px-2 w-1/4">
+            <Label.Root className="block text-sm font-bold mb-2">
+              Folder name : {folderName}
+              </Label.Root>
             <FileStore/>
           </div>
           
@@ -274,6 +284,7 @@ const EventModal = ({
       </Dialog.Content>
     </Dialog.Root>
   );
+  
 };
 
 export default EventModal;
