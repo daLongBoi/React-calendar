@@ -53,6 +53,11 @@ const EventModal = ({
               handleInputChange({
                 target: { name, value: option },
               });
+              if (name === "name") {
+                {
+                  setFolderName(formData.name);
+                }
+              }
               setTriggerText(option);
             }}
             className="text-white px-2 py-1 hover:bg-gray-700"
@@ -108,7 +113,6 @@ const EventModal = ({
               onChange={handleInputChange}
               className={inputStyle}
             />
-            {/* {setFolderName(formData.name)} */}
           </div>
           <div className="mb-4 px-2 w-1/4">
             <Label.Root className="block text-sm font-bold mb-2">
@@ -240,10 +244,7 @@ const EventModal = ({
           </div>
 
           <div className="mb-4 px-2 w-1/4">
-            <Label.Root className="block text-sm font-bold mb-2">
-              Folder name : {folderName}
-            </Label.Root>
-            {/* <FileStore /> */}
+            <FileStore value={formData.name} />
           </div>
 
           <div className="flex px-2 w-full">

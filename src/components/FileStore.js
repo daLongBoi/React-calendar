@@ -1,53 +1,62 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useState,useEffect } from 'react';
-import { storage } from '../firebase';
-import { ref, uploadBytes, listAll, getDownloadURL} from "firebase/storage";
+import { useState } from "react";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { storage } from "../firebase";
 import { v4 } from 'uuid';
-import EventModal from './EventModal';
+function FileStore() {
+  const [progress, setProgress] = useState(0);
+    const [downloadURL, setDownloadURL] = useState(null);
+  const formHandler = (e) => {
+    e.preventDefault();
+    const file = e.target[0].files[0];
+    uploadFiles(file);
+  };
 
-const FileStore = (formData) => {
-    const [imageUpload, setImageUpload] = useState(null);
-    const [uploadList, setUploadList] = useState([]);
-    const uploadReference = ref(storage, 'BookingDocuments/');
-    
-    const uploadImage = () => {
-        if (imageUpload == null) {
-            return;
-        }
-        const EventName = EventModal.folderName; 
-        console.log(EventName);
-        const imageRef = ref(storage, 'BookingDocuments/' + `${EventName}/` + `${imageUpload.name + v4()}`);
-        uploadBytes(imageRef, imageUpload).then(() => {
-            console.log('Uploaded file!');
-            alert('File Uploaded');
+  const uploadFiles = (file) => {
+    //
+    if (!file) return;
+    const sotrageRef = ref(storage, `BookingDocuments/${file.name + v4()}`);
+    const uploadTask = uploadBytesResumable(sotrageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const prog = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(prog);
+      },
+      (error) => console.log(error),
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log("File available at", downloadURL);
+            setDownloadURL(downloadURL);
         });
-    };
+      }
+    );
+  };
 
-
-    useEffect(() => {
-        listAll(uploadReference).then((res) => {
-                     res.items.forEach((itemRef) => {
-                getDownloadURL(itemRef).then((url) => {
-                    setUploadList((prev) => [...prev, { name: itemRef.name, url: url }]);
-                })
-            })
-        });
-    }, []);
-
-
-    return (
-        <div className="FileStore">
-
-            <input type="file" id="file" name="file" onChange={(event) => { setImageUpload(event.target.files[0]) }} />
-            <button 
-                          className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-
-            onClick={uploadImage}>Upload File</button>
-            {/* {uploadList.map((item) => {
-                return <Link src= {item.url} download={item.name}>{item.name}</Link>
-            })} */}
-        </div>
+  const condition =  () => {
+    if (downloadURL == null) {
+    return null ; 
+    }
+    else
+    return ( <a 
+    href="{downloadURL}">Download file: <i>download icon</i></a>
     )
+  }
+
+  return (
+    <div className="App">
+      <form onSubmit={formHandler}>
+        <input type="file" className="input" />
+        <button type="submit">Upload</button>
+      </form>
+      <hr />
+      <h2>Uploading done {progress}%</h2>
+   
+     {condition()}
+    </div>
+  );
 }
+
 export default FileStore;
