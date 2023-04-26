@@ -26,6 +26,8 @@ const Calendar = () => {
   const [calendarView, setCalendarView] = useState("weekly");
   const [folderName, setFolderName] = useState([]);
   const [operationHistory, setOperationHistory] = useState([]);
+  const [documentName, setDocumentName] = useState("");
+  const [documentDownloadURL, setDocumentDownloadURL] = useState("");
 
   const [formData, setFormData] = useState({
     startTime: "",
@@ -39,6 +41,9 @@ const Calendar = () => {
     ticketLink: "",
     description: "",
     status: "",
+    eventURL: "",
+    downloadURL: "",
+    documentName: "",
   });
 
   const firstRender = useRef(true);
@@ -70,7 +75,6 @@ const Calendar = () => {
           };
         });
         setEvents(eventsArray);
-        console.log("Events:", eventsArray);
       } else {
         setEvents([]);
       }
@@ -84,6 +88,11 @@ const Calendar = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const saveUploadURL = (name, url) => {
+    setDocumentName(name);
+    setDocumentDownloadURL(url);
   };
 
   const handleSubmit = (e) => {
@@ -106,6 +115,8 @@ const Calendar = () => {
     const endTime = new Date(`${formData.date}T${formData.endTime}`);
     const eventData = {
       ...formData,
+      documentName,
+      documentDownloadURL,
       startTime: startTime.toISOString(),
       endTime: endTime.toISOString(),
     };
@@ -121,7 +132,6 @@ const Calendar = () => {
       });
       {
         setFolderName(formData.name);
-        console.log(`Folder name: ${folderName}`);
       }
       const eventRef = ref(database, `events/${selectedEventIndex}`);
       set(eventRef, eventData, () => {
@@ -161,6 +171,8 @@ const Calendar = () => {
       accessibilityInfo: "",
       ticketLink: "",
       notes: "",
+      downloadURL: "",
+      documentName: "",
       status: "",
     });
 
@@ -171,6 +183,8 @@ const Calendar = () => {
     setSelectedEventIndex(event.id);
     setFormData({
       ...event,
+      documentName: event.documentName,
+      documentDownloadURL: event.documentDownloadURL,
       date: format(new Date(event.startTime), "yyyy-MM-dd"),
       startTime: format(new Date(event.startTime), "HH:mm"),
       endTime: format(new Date(event.endTime), "HH:mm"),
@@ -352,6 +366,8 @@ const Calendar = () => {
                         accessibilityInfo: "",
                         ticketLink: "",
                         notes: "",
+                        downloadURL: "",
+                        documentName: "",
                         status: "",
                         date: day,
                       });
@@ -398,12 +414,14 @@ const Calendar = () => {
         setShowEventModal={setShowEventModal}
         handleSubmit={handleSubmit}
         handleInputChange={handleInputChange}
+        saveUploadURL={saveUploadURL}
         formData={formData}
         roomOptions={roomOptions}
         statusOptions={statusOptions}
         editMode={editMode}
         handleDelete={handleDelete}
         handleDuplicate={handleDuplicate}
+        setFormData={setFormData}
       />
       {calendarView === "weekly" ? renderCalendar() : <MonthlyCalendar />}
 

@@ -5,12 +5,7 @@ import { v4 } from "uuid";
 import Calendar from "./Calendar";
 import { DownloadIcon, ImageIcon, SunIcon } from "@radix-ui/react-icons";
 
-function FileStore({
-  setDocumentName,
-  setDocumentDownloadURL,
-  selectedEvent,
-  setFormData,
-}) {
+function FileStore({ value, onDocumentNameChange, onDownloadURLChange }) {
   const [progress, setProgress] = useState(0);
   const [downloadURL, setDownloadURL] = useState(null);
 
@@ -21,6 +16,7 @@ function FileStore({
   };
 
   const uploadFiles = (file) => {
+    //
     if (!file) return;
     const sotrageRef = ref(storage, `BookingDocuments/${file.name}`);
     const uploadTask = uploadBytesResumable(sotrageRef, file);
@@ -38,14 +34,8 @@ function FileStore({
         getDownloadURL(ref(storage, `BookingDocuments/${file.name}`)).then(
           (url) => {
             setDownloadURL(url);
-            setDocumentName(file.name);
-            setDocumentDownloadURL(url);
-
-            // Store the file URL in the specific event data
-            setFormData((prevFormData) => ({
-              ...prevFormData,
-              fileURL: url,
-            }));
+            onDocumentNameChange(file.name);
+            onDownloadURLChange(url);
           }
         );
       }
@@ -56,16 +46,9 @@ function FileStore({
     if (downloadURL == null) {
       return null;
     }
-
     return (
-      <a
-        href={downloadURL}
-        style={{
-          pointerEvents: downloadURL ? "auto" : "none",
-          opacity: downloadURL ? 1 : 0.5,
-        }}
-      >
-        Download file: <DownloadIcon />
+      <a href={downloadURL}>
+        Download file: <DownloadIcon />{" "}
       </a>
     );
   };

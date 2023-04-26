@@ -4,8 +4,8 @@ import * as Label from "@radix-ui/react-label";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import FileStore from "./FileStore";
+import DownloadLink from "./DownloadLink";
 
-// import FileStore from "./FileStore";
 const inputStyle =
   "w-full h-10 px-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white";
 
@@ -21,6 +21,8 @@ const EventModal = ({
   capacity,
   statusOptions,
   editMode,
+  selectedEvent,
+  setFormData,
 }) => {
   const [roomTriggerText, setRoomTriggerText] = useState(
     formData.room || `Select a room`
@@ -29,9 +31,15 @@ const EventModal = ({
     formData.status || `Select a status`
   );
 
+  const [documentName, setDocumentName] = useState(null);
+  const [downloadURL, setDownloadURL] = useState(null);
+  // const [formData, setFormData] = useState({ ...initialFormData });
+
   useEffect(() => {
     setRoomTriggerText(formData.room || "Select a room");
     setStatusTriggerText(formData.status || "Select a status");
+    setDocumentName(formData.documentName || null);
+    setDownloadURL(formData.documentURL || null);
     if (!formData.doorsTime) {
       handleInputChange({ target: { name: "doorsTime", value: "19:00" } });
     }
@@ -73,6 +81,31 @@ const EventModal = ({
     </DropdownMenu.Root>
   );
 
+  const saveUploadURL = (url, name) => {
+    setDownloadURL(url);
+    setDocumentName(name);
+    handleInputChange({
+      target: { name: "documentURL", value: url },
+    });
+    handleInputChange({
+      target: { name: "documentName", value: name },
+    });
+  };
+
+  //   return (
+  //     <div className="mb-4">
+  //       <p className="font-bold mb-1">Uploaded Document:</p>
+  //       <a
+  //         href={url}
+  //         download={name}
+  //         className="text-blue-500 hover:text-blue-700"
+  //       >
+  //         {name}
+  //       </a>
+  //     </div>
+  //   );
+  // };
+
   return (
     <Dialog.Root open={showEventModal} onClose={() => setShowEventModal(false)}>
       <Dialog.Overlay className="fixed z-10 inset-0 bg-black opacity-50" />
@@ -81,6 +114,7 @@ const EventModal = ({
         as="form"
       >
         <div className="flex justify-between items-start px-2">
+          {/* {console.log(formData)} */}
           <h2 className="text-xl mb-4 font-bold">
             {editMode ? "Edit Event" : "Add Event"}
           </h2>
@@ -246,10 +280,32 @@ const EventModal = ({
               rows="8"
             />
           </div>
-
+          {/* <input
+            type="hidden"
+            name="documentURL"
+            value={formData.documentURL}
+            onChange={handleInputChange}
+          /> */}
           <div className="mb-4 px-2 w-1/4">
-            <FileStore value={formData.name} />
+            <FileStore
+              setDocumentName={setDocumentName}
+              currentDocumentName={documentName}
+              currentDownloadURL={downloadURL}
+              // setDocumentName={setDocumentName}
+              setDocumentDownloadURL={setDownloadURL}
+              selectedEvent={selectedEvent}
+              setFormData={setFormData}
+            />
           </div>
+          <a
+            href={formData.fileURL}
+            download={formData.fileURL}
+            target="_blank"
+            rel="noreferrer"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Download {formData.documentName}
+          </a>
 
           <div className="flex px-2 w-full">
             <button
