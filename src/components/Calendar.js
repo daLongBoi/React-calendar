@@ -25,6 +25,7 @@ const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarView, setCalendarView] = useState("weekly"); // Add this line
   const [folderName, setFolderName] = useState([]);
+  const [operationHistory, setOperationHistory] = useState([]);
 
   const [formData, setFormData] = useState({
     startTime: "",
@@ -41,6 +42,13 @@ const Calendar = () => {
   });
 
   const firstRender = useRef(true);
+
+  const addToOperationHistory = (operationType, eventData) => {
+    setOperationHistory((prevOperationHistory) => [
+      ...prevOperationHistory,
+      { operationType, eventData },
+    ]);
+  };
 
   const toggleCalendarView = () => {
     setCalendarView((prevView) =>
@@ -115,6 +123,13 @@ const Calendar = () => {
             (event) => event.id === selectedEventIndex
           );
           updatedEvents[index] = eventData;
+          addToOperationHistory("update", {
+            eventId: selectedEventIndex,
+            oldEventData: events.find(
+              (event) => event.id === selectedEventIndex
+            ),
+            newEventData: eventData,
+          });
           return updatedEvents;
         });
       });
@@ -126,6 +141,7 @@ const Calendar = () => {
           { id: newEventRef.key, ...eventData },
         ]);
       });
+      addToOperationHistory("create", { eventId: newEventRef.key, eventData });
     }
 
     setFormData({
@@ -157,6 +173,13 @@ const Calendar = () => {
 
   const handleDelete = () => {
     if (selectedEventIndex !== null) {
+      const eventToDelete = events.find(
+        (event) => event.id === selectedEventIndex
+      );
+      addToOperationHistory("delete", {
+        eventId: selectedEventIndex,
+        eventData: eventToDelete,
+      });
       const eventRef = ref(database, `events/${selectedEventIndex}`);
       remove(eventRef);
       setSelectedEventIndex(null);
@@ -176,6 +199,24 @@ const Calendar = () => {
       set(newEventRef, newEvent, () => {
         setEvents([...events, newEvent]);
       });
+    }
+  };
+
+  const handleUndo = () => {
+    const lastOperation = operationHistory.pop();
+    if (lastOperation) {
+      const eventRef = ref(
+        database,
+        `events/${lastOperation.eventData.eventId}`
+      );
+      if (lastOperation.operationType === "create") {
+        remove(eventRef);
+      } else if (lastOperation.operationType === "delete") {
+        set(eventRef, lastOperation.eventData);
+      } else if (lastOperation.operationType === "update") {
+        set(eventRef, lastOperation.eventData.oldEventData);
+      }
+      setOperationHistory(operationHistory);
     }
   };
 
@@ -309,6 +350,13 @@ const Calendar = () => {
         />
         <span className="ml-2">Monthly</span>
       </div>
+
+      <button
+        onClick={handleUndo}
+        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold w-1/5 rounded py-3 px-4 focus:outline-none focus:shadow-outline"
+      >
+        Undo
+      </button>
 
       <EventModal
         showEventModal={showEventModal}
