@@ -10,7 +10,7 @@ import Calendar from "./components/Calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Menu from "./components/Menu";
 import "./styles/globals.css";
-import FileStore from "./components/FileStore";
+// import FileStore from "./components/FileStore";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
       <BrowserRouter>
         <AuthContextProvider>
           <Menu></Menu>
-          
+
           <Routes>
             <Route path="/" element={<Signin />} />
             {/* <Route path="/register" element={<Signup />} /> */}

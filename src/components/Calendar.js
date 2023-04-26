@@ -295,6 +295,15 @@ const Calendar = () => {
           The Court House events
         </h1>
       </div>
+      <div className="flex items-center justify-end mb-4">
+        <span className="mr-2">Weekly</span>
+        <Toggle
+          value={calendarView === "monthly"}
+          onValueChange={toggleCalendarView}
+        />
+        <span className="ml-2">Monthly</span>
+      </div>
+
       <EventModal
         showEventModal={showEventModal}
         setShowEventModal={setShowEventModal}
@@ -307,7 +316,7 @@ const Calendar = () => {
         handleDelete={handleDelete}
         handleDuplicate={handleDuplicate}
       />
-      {renderCalendar()}
+      {calendarView === "weekly" ? renderCalendar() : <MonthlyCalendar />}
 
       <div className="flex justify-between my-6">
         <button
