@@ -23,7 +23,7 @@ const Calendar = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedEventIndex, setSelectedEventIndex] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendarView, setCalendarView] = useState("weekly"); // Add this line
+  const [calendarView, setCalendarView] = useState("weekly");
   const [folderName, setFolderName] = useState([]);
   const [operationHistory, setOperationHistory] = useState([]);
 
