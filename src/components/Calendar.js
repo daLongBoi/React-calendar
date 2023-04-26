@@ -23,8 +23,9 @@ const Calendar = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedEventIndex, setSelectedEventIndex] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendarView, setCalendarView] = useState("weekly"); // Add this line
+  const [calendarView, setCalendarView] = useState("weekly");
   const [folderName, setFolderName] = useState([]);
+  const [operationHistory, setOperationHistory] = useState([]);
 
   const [formData, setFormData] = useState({
     startTime: "",
@@ -41,6 +42,13 @@ const Calendar = () => {
   });
 
   const firstRender = useRef(true);
+
+  const addToOperationHistory = (operationType, eventData) => {
+    setOperationHistory((prevOperationHistory) => [
+      ...prevOperationHistory,
+      { operationType, eventData },
+    ]);
+  };
 
   const toggleCalendarView = () => {
     setCalendarView((prevView) =>
@@ -103,6 +111,14 @@ const Calendar = () => {
     };
 
     if (editMode) {
+      const oldEventData = events.find(
+        (event) => event.id === selectedEventIndex
+      );
+      // Add eventId to the operation history
+      addToOperationHistory("update", {
+        eventId: selectedEventIndex,
+        oldEventData,
+      });
       {
         setFolderName(formData.name);
         console.log(`Folder name: ${folderName}`);
@@ -115,6 +131,13 @@ const Calendar = () => {
             (event) => event.id === selectedEventIndex
           );
           updatedEvents[index] = eventData;
+          addToOperationHistory("update", {
+            eventId: selectedEventIndex,
+            oldEventData: events.find(
+              (event) => event.id === selectedEventIndex
+            ),
+            newEventData: eventData,
+          });
           return updatedEvents;
         });
       });
@@ -126,6 +149,7 @@ const Calendar = () => {
           { id: newEventRef.key, ...eventData },
         ]);
       });
+      addToOperationHistory("create", { eventId: newEventRef.key, eventData });
     }
 
     setFormData({
@@ -156,11 +180,28 @@ const Calendar = () => {
   };
 
   const handleDelete = () => {
-    if (selectedEventIndex !== null) {
-      const eventRef = ref(database, `events/${selectedEventIndex}`);
-      remove(eventRef);
-      setSelectedEventIndex(null);
-    }
+    const oldEventData = events.find(
+      (event) => event.id === selectedEventIndex
+    );
+
+    // Remove the event from the state
+    setEvents((prevEvents) => {
+      return prevEvents.filter((event) => event.id !== selectedEventIndex);
+    });
+
+    // Add the delete operation to the history
+    addToOperationHistory("delete", {
+      eventId: selectedEventIndex,
+      oldEventData,
+    });
+
+    // Remove the event from the database
+    const eventRef = ref(database, `events/${selectedEventIndex}`);
+    remove(eventRef);
+
+    setSelectedEventIndex(null);
+    setEditMode(false);
+    setShowEventModal(false);
   };
 
   const handleDuplicate = (eventId) => {
@@ -176,6 +217,41 @@ const Calendar = () => {
       set(newEventRef, newEvent, () => {
         setEvents([...events, newEvent]);
       });
+    }
+    setEditMode(false);
+    setShowEventModal(false);
+  };
+
+  const handleUndo = async () => {
+    if (operationHistory.length > 0) {
+      const lastOperation = operationHistory[operationHistory.length - 1];
+      const eventRef = ref(
+        database,
+        `events/${lastOperation.eventData.eventId}`
+      );
+
+      if (lastOperation.operationType === "create") {
+        await remove(eventRef);
+      } else if (lastOperation.operationType === "update") {
+        await set(eventRef, {
+          ...lastOperation.eventData.oldEventData,
+          startTime:
+            lastOperation.eventData.oldEventData.startTime.toISOString(),
+          endTime: lastOperation.eventData.oldEventData.endTime.toISOString(),
+        });
+      } else if (lastOperation.operationType === "delete") {
+        await set(eventRef, {
+          ...lastOperation.eventData.oldEventData,
+          startTime:
+            lastOperation.eventData.oldEventData.startTime.toISOString(),
+          endTime: lastOperation.eventData.oldEventData.endTime.toISOString(),
+        });
+      }
+
+      // Remove the last operation from the history
+      setOperationHistory((prevOperationHistory) =>
+        prevOperationHistory.slice(0, -1)
+      );
     }
   };
 
@@ -309,6 +385,13 @@ const Calendar = () => {
         />
         <span className="ml-2">Monthly</span>
       </div>
+
+      <button
+        onClick={handleUndo}
+        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold w-1/5 rounded py-3 px-4 focus:outline-none focus:shadow-outline"
+      >
+        Undo
+      </button>
 
       <EventModal
         showEventModal={showEventModal}

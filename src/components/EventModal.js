@@ -32,6 +32,15 @@ const EventModal = ({
   useEffect(() => {
     setRoomTriggerText(formData.room || "Select a room");
     setStatusTriggerText(formData.status || "Select a status");
+    if (!formData.doorsTime) {
+      handleInputChange({ target: { name: "doorsTime", value: "19:00" } });
+    }
+    if (!formData.startTime) {
+      handleInputChange({ target: { name: "startTime", value: "20:00" } });
+    }
+    if (!formData.endTime) {
+      handleInputChange({ target: { name: "endTime", value: "23:00" } });
+    }
   }, [formData]);
 
   const renderSelect = (name, options, triggerText, setTriggerText) => (
