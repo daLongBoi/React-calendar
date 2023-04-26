@@ -111,6 +111,14 @@ const Calendar = () => {
     };
 
     if (editMode) {
+      const oldEventData = events.find(
+        (event) => event.id === selectedEventIndex
+      );
+      // Add eventId to the operation history
+      addToOperationHistory("update", {
+        eventId: selectedEventIndex,
+        oldEventData,
+      });
       {
         setFolderName(formData.name);
         console.log(`Folder name: ${folderName}`);
@@ -172,18 +180,28 @@ const Calendar = () => {
   };
 
   const handleDelete = () => {
-    if (selectedEventIndex !== null) {
-      const eventToDelete = events.find(
-        (event) => event.id === selectedEventIndex
-      );
-      addToOperationHistory("delete", {
-        eventId: selectedEventIndex,
-        eventData: eventToDelete,
-      });
-      const eventRef = ref(database, `events/${selectedEventIndex}`);
-      remove(eventRef);
-      setSelectedEventIndex(null);
-    }
+    const oldEventData = events.find(
+      (event) => event.id === selectedEventIndex
+    );
+
+    // Remove the event from the state
+    setEvents((prevEvents) => {
+      return prevEvents.filter((event) => event.id !== selectedEventIndex);
+    });
+
+    // Add the delete operation to the history
+    addToOperationHistory("delete", {
+      eventId: selectedEventIndex,
+      oldEventData,
+    });
+
+    // Remove the event from the database
+    const eventRef = ref(database, `events/${selectedEventIndex}`);
+    remove(eventRef);
+
+    setSelectedEventIndex(null);
+    setEditMode(false);
+    setShowEventModal(false);
   };
 
   const handleDuplicate = (eventId) => {
@@ -200,23 +218,40 @@ const Calendar = () => {
         setEvents([...events, newEvent]);
       });
     }
+    setEditMode(false);
+    setShowEventModal(false);
   };
 
-  const handleUndo = () => {
-    const lastOperation = operationHistory.pop();
-    if (lastOperation) {
+  const handleUndo = async () => {
+    if (operationHistory.length > 0) {
+      const lastOperation = operationHistory[operationHistory.length - 1];
       const eventRef = ref(
         database,
         `events/${lastOperation.eventData.eventId}`
       );
+
       if (lastOperation.operationType === "create") {
-        remove(eventRef);
-      } else if (lastOperation.operationType === "delete") {
-        set(eventRef, lastOperation.eventData);
+        await remove(eventRef);
       } else if (lastOperation.operationType === "update") {
-        set(eventRef, lastOperation.eventData.oldEventData);
+        await set(eventRef, {
+          ...lastOperation.eventData.oldEventData,
+          startTime:
+            lastOperation.eventData.oldEventData.startTime.toISOString(),
+          endTime: lastOperation.eventData.oldEventData.endTime.toISOString(),
+        });
+      } else if (lastOperation.operationType === "delete") {
+        await set(eventRef, {
+          ...lastOperation.eventData.oldEventData,
+          startTime:
+            lastOperation.eventData.oldEventData.startTime.toISOString(),
+          endTime: lastOperation.eventData.oldEventData.endTime.toISOString(),
+        });
       }
-      setOperationHistory(operationHistory);
+
+      // Remove the last operation from the history
+      setOperationHistory((prevOperationHistory) =>
+        prevOperationHistory.slice(0, -1)
+      );
     }
   };
 
