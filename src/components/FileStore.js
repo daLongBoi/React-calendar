@@ -2,9 +2,14 @@ import { useState } from "react";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../firebase";
 import { v4 } from 'uuid';
+import Calendar from "./Calendar";
+import { DownloadIcon, ImageIcon, SunIcon } from '@radix-ui/react-icons'
+
+
 function FileStore() {
   const [progress, setProgress] = useState(0);
     const [downloadURL, setDownloadURL] = useState(null);
+
   const formHandler = (e) => {
     e.preventDefault();
     const file = e.target[0].files[0];
@@ -14,7 +19,7 @@ function FileStore() {
   const uploadFiles = (file) => {
     //
     if (!file) return;
-    const sotrageRef = ref(storage, `BookingDocuments/${file.name + v4()}`);
+    const sotrageRef = ref(storage,`BookingDocuments/${file.name}`);
     const uploadTask = uploadBytesResumable(sotrageRef, file);
 
     uploadTask.on(
@@ -27,9 +32,10 @@ function FileStore() {
       },
       (error) => console.log(error),
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log("File available at", downloadURL);
-            setDownloadURL(downloadURL);
+        getDownloadURL(ref(storage,`BookingDocuments/${file.name}`)).then((url) => {
+            <img src={url} />
+            console.log("File available at", url);
+            setDownloadURL(url);
         });
       }
     );
@@ -41,7 +47,7 @@ function FileStore() {
     }
     else
     return ( <a 
-    href="{downloadURL}">Download file: <i>download icon</i></a>
+    href={downloadURL}>Download file: <DownloadIcon/> </a>
     )
   }
 
@@ -52,8 +58,6 @@ function FileStore() {
         <button type="submit">Upload</button>
       </form>
       <hr />
-      <h2>Uploading done {progress}%</h2>
-   
      {condition()}
     </div>
   );
