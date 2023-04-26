@@ -24,6 +24,8 @@ const Calendar = () => {
   const [selectedEventIndex, setSelectedEventIndex] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarView, setCalendarView] = useState("weekly"); // Add this line
+  const [folderName, setFolderName] = useState([]);
+
   const [formData, setFormData] = useState({
     startTime: "",
     endTime: "",
@@ -101,6 +103,10 @@ const Calendar = () => {
     };
 
     if (editMode) {
+      {
+        setFolderName(formData.name);
+        console.log(`Folder name: ${folderName}`);
+      }
       const eventRef = ref(database, `events/${selectedEventIndex}`);
       set(eventRef, eventData, () => {
         setEvents((prevEvents) => {

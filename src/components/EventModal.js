@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Label from "@radix-ui/react-label";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import FileStore from "./FileStore";
 
 // import FileStore from "./FileStore";
 const inputStyle =
@@ -28,8 +29,6 @@ const EventModal = ({
     formData.status || `Select a status`
   );
 
-  const [folderName, setFolderName] = useState([]);
-
   useEffect(() => {
     setRoomTriggerText(formData.room || "Select a room");
     setStatusTriggerText(formData.status || "Select a status");
@@ -53,11 +52,7 @@ const EventModal = ({
               handleInputChange({
                 target: { name, value: option },
               });
-              if (name === "name") {
-                {
-                  setFolderName(formData.name);
-                }
-              }
+
               setTriggerText(option);
             }}
             className="text-white px-2 py-1 hover:bg-gray-700"
