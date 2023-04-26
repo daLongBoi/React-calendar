@@ -92,20 +92,6 @@ const EventModal = ({
     });
   };
 
-  //   return (
-  //     <div className="mb-4">
-  //       <p className="font-bold mb-1">Uploaded Document:</p>
-  //       <a
-  //         href={url}
-  //         download={name}
-  //         className="text-blue-500 hover:text-blue-700"
-  //       >
-  //         {name}
-  //       </a>
-  //     </div>
-  //   );
-  // };
-
   return (
     <Dialog.Root open={showEventModal} onClose={() => setShowEventModal(false)}>
       <Dialog.Overlay className="fixed z-10 inset-0 bg-black opacity-50" />

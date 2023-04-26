@@ -148,6 +148,7 @@ const Calendar = () => {
             ),
             newEventData: eventData,
           });
+
           return updatedEvents;
         });
       });
@@ -401,14 +402,12 @@ const Calendar = () => {
         />
         <span className="ml-2">Monthly</span>
       </div>
-
       <button
         onClick={handleUndo}
         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold w-1/5 rounded py-3 px-4 focus:outline-none focus:shadow-outline"
       >
         Undo
       </button>
-
       <EventModal
         showEventModal={showEventModal}
         setShowEventModal={setShowEventModal}
@@ -424,7 +423,6 @@ const Calendar = () => {
         setFormData={setFormData}
       />
       {calendarView === "weekly" ? renderCalendar() : <MonthlyCalendar />}
-
       <div className="flex justify-between my-6">
         <button
           onClick={() => setCurrentDate((prevDate) => addDays(prevDate, -14))}
