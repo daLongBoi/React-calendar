@@ -30,7 +30,7 @@ const EventModal = ({
 
   const [folderName, setFolderName] = useState([]);
 
-  
+
   useEffect(() => {
     setRoomTriggerText(formData.room || "Select a room");
     setStatusTriggerText(formData.status || "Select a status");
@@ -51,8 +51,12 @@ const EventModal = ({
           <DropdownMenu.Item
             key={index}
             onSelect={() => {
-              handleInputChange({ 
-                target: { name, value: option } });
+              handleInputChange({
+                target: { name, value: option }
+              });
+              if (name === "name") {
+                { setFolderName(formData.name) }
+              }
               setTriggerText(option);
             }}
             className="text-white px-2 py-1 hover:bg-gray-700"
@@ -106,9 +110,8 @@ const EventModal = ({
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={inputStyle}       
+              className={inputStyle}
             />
-            {/* {setFolderName(formData.name)} */}
 
           </div>
           <div className="mb-4 px-2 w-1/4">
@@ -241,12 +244,9 @@ const EventModal = ({
           </div>
 
           <div className="mb-4 px-2 w-1/4">
-            <Label.Root className="block text-sm font-bold mb-2">
-              Folder name : {folderName}
-              </Label.Root>
-            <FileStore/>
+            <FileStore value={formData.name} />
           </div>
-          
+
           <div className="flex px-2 w-full">
             <button
               type="button"
@@ -284,7 +284,7 @@ const EventModal = ({
       </Dialog.Content>
     </Dialog.Root>
   );
-  
+
 };
 
 export default EventModal;
